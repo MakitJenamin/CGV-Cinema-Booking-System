@@ -28,6 +28,8 @@ import { redisProvider } from './providers/redis.provider';
 import { SeatSelectionGateway } from './gateways/seat-selection.gateway';
 // Import PricingService để tính giá
 import { PricingService } from './pricing.service';
+// Import PaymentGatewayService mô phỏng cổng thanh toán online (QR / Credit Card)
+import { PaymentGatewayService } from './payment-gateway.service';
 
 @Module({
   imports: [
@@ -54,6 +56,7 @@ import { PricingService } from './pricing.service';
     BookingService, // Service chứa business logic
     BookingScheduler, // Cron job để hủy reservations hết hạn
     PricingService, // Service tính toán giá vé
+    PaymentGatewayService, // Service mô phỏng cổng thanh toán (QR, Credit Card)
     redisProvider, // Redis client provider (dùng để làm distributed lock)
     SeatSelectionGateway, // Socket.IO gateway để broadcast events
   ],

@@ -1,5 +1,5 @@
-// PayNowDto - Dữ liệu khi user thanh toán ngay (không qua reservedTicket)
-// DTO này dùng để validate dữ liệu đầu vào từ client
+// PayNowSeatsDto - Dữ liệu khi user thanh toán ngay cho nhiều ghế cùng lúc (không qua reservedTicket)
+// DTO này dùng để validate dữ liệu đầu vào từ client khi thanh toán nhiều ghế
 
 import {
   IsNotEmpty,
@@ -7,7 +7,10 @@ import {
   IsString,
   IsEnum,
   IsOptional,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 // Enum định nghĩa các phương thức thanh toán hợp lệ
 export enum PaymentMethod {
@@ -17,12 +20,8 @@ export enum PaymentMethod {
   E_WALLET = 'e_wallet', // Ví điện tử
 }
 
-export class PayNowDto {
-  // ID của suất chiếu (show)
-  @IsNotEmpty()
-  @IsMongoId()
-  showId: string;
-
+// Interface cho thông tin 1 ghế trong mảng
+class SeatInfo {
   // ID của ghế muốn thanh toán
   @IsNotEmpty()
   @IsMongoId()
@@ -36,14 +35,28 @@ export class PayNowDto {
   // Số ghế trong row (ví dụ: 1)
   @IsNotEmpty()
   seatNumber: number;
+}
+
+export class PayNowSeatsDto {
+  // ID của suất chiếu (show)
+  @IsNotEmpty()
+  @IsMongoId()
+  showId: string;
+
+  // Mảng các ghế muốn thanh toán (tối thiểu 1 ghế)
+  @IsNotEmpty()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SeatInfo)
+  seats: SeatInfo[];
 
   // Phương thức thanh toán (phải là một trong các giá trị của PaymentMethod enum)
   @IsNotEmpty()
-  @IsEnum(PaymentMethod) // Chỉ chấp nhận các giá trị trong enum PaymentMethod
+  @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod;
 
   // Mã voucher (tuỳ chọn, user có thể nhập mã giảm giá)
-  @IsOptional() // Không bắt buộc
+  @IsOptional()
   @IsString()
   voucherCode?: string;
 
@@ -51,4 +64,10 @@ export class PayNowDto {
   @IsOptional()
   @IsString()
   quoteId?: string;
+
+  // Return URL (tuỳ chọn, URL FE nhận kết quả sau khi thanh toán xong)
+  // Nếu không có, BE sẽ dùng default URL
+  @IsOptional()
+  @IsString()
+  returnUrl?: string;
 }

@@ -1,5 +1,6 @@
 // SelectSeatDto - Dữ liệu khi user click chọn ghế (bắt đầu selecting)
 // DTO này dùng để validate dữ liệu đầu vào từ client
+// Client sẽ gửi mảng SelectSeatDto[] - mỗi phần tử là 1 ghế đang chọn
 
 import { IsNotEmpty, IsMongoId, IsString } from 'class-validator';
 

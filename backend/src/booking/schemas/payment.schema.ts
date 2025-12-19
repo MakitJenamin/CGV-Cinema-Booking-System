@@ -26,6 +26,13 @@ interface TaxBreakdown {
   amount: number; // Số tiền thuế (VND)
 }
 
+// Snapshot ghế được thanh toán trong payment (để webhook dùng phát hành vé)
+interface SeatSnapshot {
+  seatId: Types.ObjectId;
+  seatRow: string;
+  seatNumber: number;
+}
+
 @Schema({
   timestamps: true, // Tự động thêm createdAt và updatedAt
   collection: 'payments',
@@ -70,6 +77,26 @@ export class Payment {
   // Thời gian thanh toán thành công
   @Prop({ type: Date })
   paidAt?: Date;
+
+  // Mã đơn hàng gửi sang cổng thanh toán (orderCode)
+  @Prop()
+  orderCode?: string;
+
+  // URL QR (nếu thanh toán QR / e-wallet)
+  @Prop()
+  qrUrl?: string;
+
+  // URL checkout (nếu thanh toán thẻ)
+  @Prop()
+  checkoutUrl?: string;
+
+  // Show mà payment này áp dụng (để cập nhật seatStates / tạo tickets)
+  @Prop({ type: Types.ObjectId, ref: 'Show' })
+  showId?: Types.ObjectId;
+
+  // Snapshot danh sách ghế được thanh toán (phục vụ webhook finalize)
+  @Prop({ type: Array, default: [] })
+  seats?: SeatSnapshot[];
 
   // Chi tiết các khoản giảm giá (để hiển thị breakdown)
   @Prop({ type: Array, default: [] })
